@@ -43,7 +43,8 @@ namespace asp_mvc_2.Controllers
                 return PartialView(UDV);
             }
             return RedirectToAction("Index", "Home");
-        }
+        }
+
 
         [AuthorizeRoles("Admin")]
         public ActionResult UpdateUserData(int userID, string loginName, string password,
@@ -68,6 +69,28 @@ string firstName, string lastName, string gender, int roleID = 0)
             UserManager UM = new UserManager();
             UM.DeleteUser(userID);
             return Json(new { success = true });
+        }
+
+        [Authorize]
+        public ActionResult EditProfile()
+        {
+            string loginName = User.Identity.Name;
+            UserManager UM = new UserManager();
+            UserProfileView UPV = UM.GetUserProfile(UM.GetUserID(loginName));
+            return View(UPV);
+        }
+        [HttpPost]
+        [Authorize]
+        public ActionResult EditProfile(UserProfileView profile)
+        {
+            if (ModelState.IsValid)
+            {
+                UserManager UM = new UserManager();
+                UM.UpdateUserAccount(profile);
+                ViewBag.Status = "Update Sucessful!";
+            }
+            return View(profile);
         }
+
     }
 }
